@@ -34,6 +34,7 @@ describe("`MediaComments` class", function() {
             feed.moreAvailable.should.equal(true);
             done()
         })
+            .catch(done)
     })
 
 })

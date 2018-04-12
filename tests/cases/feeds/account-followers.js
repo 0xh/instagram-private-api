@@ -28,6 +28,7 @@ describe("`AccountFollowers` class", function() {
             feed.moreAvailable.should.equal(true);
             done()
         })
+            .catch(done)
     })
 
     it("should not be problem to get all followers with limit 400", function(done) {
@@ -39,6 +40,7 @@ describe("`AccountFollowers` class", function() {
             feed.moreAvailable.should.be.Boolean();
             done()
         })
+            .catch(done)
     })
 
 })

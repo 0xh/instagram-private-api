@@ -20,6 +20,7 @@ describe("`InboxPending` class", function() {
             feed.isMoreAvailable().should.be.Boolean();
             done();
         })
+            .catch(done)
     })
 
 });

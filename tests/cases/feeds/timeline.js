@@ -28,6 +28,7 @@ describe("`Timeline` class", function() {
             feed.moreAvailable.should.equal(true);
             done()
         })
+            .catch(done)
     })
 
 })

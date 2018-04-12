@@ -28,5 +28,6 @@ describe("`AccountFollowing` class", function() {
             feed.moreAvailable.should.equal(false);
             done()
         })
+            .catch(done)
     })
 })

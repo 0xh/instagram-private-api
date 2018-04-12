@@ -39,8 +39,6 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 describe("Sessions", function () {
     before(function (done) {
-        // Wait one hour
-        this.timeout(60 * 60 * 1000);
         support.credentials()
             .then(function (auth) {
                 credentails = auth;
@@ -87,7 +85,7 @@ describe("Sessions", function () {
                 .then(function(account) {
                     account.params.username.should.be.equal('instagram');
                     done();
-                }) 
+                })
         })
 
         it("should not be problem to show discover feed", function(done) {
@@ -97,7 +95,8 @@ describe("Sessions", function () {
                     discover[0].account.should.be.instanceOf(Client.Account)
                     discover[0].mediaIds.should.be.Array();
                     done();
-                }) 
+                })
+                .catch(done)
         })
 
         it("should be able to ask for json endpoint trough web-request", function(done) {
@@ -107,21 +106,25 @@ describe("Sessions", function () {
                 .setJSONEndpoint()
                 .send()
                 .then(function(result) {
-                    result.user.should.be.Object();
-                    result.user.username.should.be.String();
-                    result.user.username.should.equal('instagram')
+                    result.should.be.Object();
+                    result.graphql.should.be.Object();
+                    result.graphql.user.should.be.Object();
+                    result.graphql.user.username.should.be.String();
+                    result.graphql.user.username.should.equal('instagram')
                     done();
-                }) 
+                })
+                .catch(done)
         })
 
         it("should not be problem to get media likers", function(done) {
             Client.Media.likers(session, '1317759032287303554_25025320')
                 .then(function(likers) {
-                    _.each(likers, function(liker){ 
+                    _.each(likers, function(liker){
                         liker.should.be.instanceOf(Client.Account)
                     })
                     done();
-                });
+                })
+                .catch(done)
         })
 
         it("should be able to block user", function(done) {
@@ -131,6 +134,7 @@ describe("Sessions", function () {
                     relationship.params.blocking.should.be.Boolean();
                     done();
                 })
+                .catch(done)
         })
 
         it("should be able to unblock user", function(done) {
@@ -140,6 +144,7 @@ describe("Sessions", function () {
                     relationship.params.blocking.should.be.Boolean();
                     done();
                 })
+                .catch(done)
         })
 
 
@@ -161,6 +166,7 @@ describe("Sessions", function () {
                     shouldBeValidLocation(first.location);
                     done();
                 })
+                .catch(done)
         })
 
         it("should not be problem to like media", function(done) {
@@ -180,6 +186,7 @@ describe("Sessions", function () {
                     m.params.hasLiked.should.equal(true);
                     done();
                 })
+                .catch(done)
         })
 
         it("should not be problem to search hashtag", function(done) {
@@ -190,6 +197,7 @@ describe("Sessions", function () {
                     })
                     done();
                 })
+                .catch(done)
         })
 
         it("should not be problem to use in memeroy cookies", function(done) {
@@ -204,6 +212,7 @@ describe("Sessions", function () {
                 account.should.be.instanceOf(Client.Account)
                 done();
             })
+                .catch(done)
         })
 
         it("should not be problem to upload profile picture", function(done) {

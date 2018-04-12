@@ -40,6 +40,7 @@ describe("`Inbox` class", function() {
             .then(function () {
                 done()
             })
+            .catch(done)
     })
 
 });
@@ -48,14 +49,15 @@ describe("`Inbox` class", function() {
 
 describe("`ThreadItemsFeed` class", function() {
 
-    var feed, session;
+    var session;
 
     before(function() {
         session = require('../../run').session;
-        feed = new Client.Feed.ThreadItems(session, threadBigOne.id);
     });
 
     it("should not be problem to get items", function(done) {
+        const feed = new Client.Feed.ThreadItems(session, threadBigOne.id);
+
         feed.get().then(function(items) {
             _.each(items, shouldBeThreadItem);
             feed.isMoreAvailable().should.be.Boolean();
