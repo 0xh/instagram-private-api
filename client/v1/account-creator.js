@@ -1,6 +1,4 @@
 import _ from "lodash"
-//var fs = require("fs");
-import path, { relative } from "path"
 import crypto from "crypto"
 import Resource from "./resource"
 import Helpers from "../../helpers"
