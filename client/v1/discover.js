@@ -1,10 +1,12 @@
-var Request = require('./request');
-var Helpers = require('../../helpers');
-var _ = require('lodash');
-var Media = require('./media');
-var Account = require('./account');
+import Request from "./request"
+import Helpers from "../../helpers"
+import _ from "lodash"
+import Media from "./media"
+import Account from "./account"
 
-module.exports = function(session, inSingup) {
+
+
+export default async function(session, inSingup) {
     return new Request(session)
         .setMethod('POST')
         .setResource('discoverAyml')
@@ -22,10 +24,7 @@ module.exports = function(session, inSingup) {
                 return {
                     account: new Account(session, item.user),
                     mediaIds: item.media_ids
-                }       
+                }
             })
         })
 };
-
-
-
