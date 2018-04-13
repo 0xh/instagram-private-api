@@ -2,7 +2,7 @@ import _ from "lodash"
 import Resource from "./resource"
 import Request from "./request"
 import Account from "./account"
-import Exceptions from "./exceptions"
+import {TooManyFollowsError,RequestError} from "./exceptions"
 
 export default class Relationship extends Resource {
    constructor() {
@@ -89,10 +89,10 @@ export default class Relationship extends Resource {
          })
          .catch(function(err) {
             if (
-               err instanceof Exceptions.RequestError &&
+               err instanceof RequestError &&
                err.message.indexOf("following the max limit") !== -1
             ) {
-               throw new Exceptions.TooManyFollowsError()
+               throw new TooManyFollowsError()
             } else {
                throw err
             }

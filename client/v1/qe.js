@@ -1,7 +1,6 @@
 import Resource from "./resource"
 import _ from "lodash"
 import CONSTANTS from "constants"
-import Exceptions from "./exceptions"
 import Request from "./request"
 
 export default class QE extends Resource {

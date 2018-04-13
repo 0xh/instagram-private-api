@@ -8,7 +8,7 @@ import Request from "./request"
 import Comment from "./comment"
 import Account from "./account"
 import Location from "./location"
-import Exceptions from "./exceptions"
+import {NotFoundError,RequestError,TranscodeTimeoutError} from "./exceptions"
 import camelKeys from "camelcase-keys"
 
 export default class Media extends Resource {
@@ -86,7 +86,7 @@ export default class Media extends Resource {
             return self.getById(session, response.media_id)
          })
          .catch(function(reason) {
-            if (reason.error === "No URL Match") throw new Exceptions.NotFoundError("No URL Match")
+            if (reason.error === "No URL Match") throw new NotFoundError("No URL Match")
             else throw reason
          })
    }
@@ -113,7 +113,7 @@ export default class Media extends Resource {
          .send()
          .then(function(json) {
             if (json.did_delete) return
-            throw new Exceptions.RequestError({
+            throw new RequestError({
                messaage: "Not posible to delete medium!"
             })
          })
@@ -139,7 +139,7 @@ export default class Media extends Resource {
             if (json.media.caption_is_edited) {
                return new Media(session, json.media)
             }
-            throw new Exceptions.RequestError({
+            throw new RequestError({
                messaage: "Edit media not successful!"
             })
          })
@@ -263,7 +263,7 @@ export default class Media extends Resource {
                .then(function(json) {
                   return new Media(session, json.media)
                })
-               .catch(Exceptions.TranscodeTimeoutError, function(error) {
+               .catch(TranscodeTimeoutError, function(error) {
                   //Well, we just want to repeat our request. Dunno why this is happening and we should not let our users deal with this crap themselves.
                   return Media.configureVideo(session, uploadId, caption, durationms, delay)
                })

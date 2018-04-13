@@ -5,7 +5,7 @@ import request from "request-promise"
 import RequestJar from "./jar"
 import CONSTANTS from "./constants"
 import Account from "./account"
-import Exceptions from "./exceptions"
+import {AuthenticationError,AccountBanned,RequestsLimitError,CheckpointError,CookieNotValidError,RequestsLimitError} from "./exceptions"
 import Request from "./request"
 import Device from "./device"
 import QE from "./qe"
@@ -106,9 +106,9 @@ export default class Session extends Resource {
          .send()
          .catch(function(error) {
             if (error.name == "RequestError" && _.isObject(error.json)) {
-               if (error.json.invalid_credentials) throw new Exceptions.AuthenticationError(error.message)
+               if (error.json.invalid_credentials) throw new AuthenticationError(error.message)
                if (error.json.error_type === "inactive user")
-                  throw new Exceptions.AccountBanned(error.json.message + " " + error.json.help_url)
+                  throw new AccountBanned(error.json.message + " " + error.json.help_url)
             }
             throw error
          })
@@ -117,7 +117,7 @@ export default class Session extends Resource {
          })
          .spread(function(session) {
             var autocomplete = Relationship.autocompleteUserList(session).catch(
-               Exceptions.RequestsLimitError,
+               RequestsLimitError,
                function() {
                   // autocompleteUserList has ability to fail often
                   return false
@@ -140,7 +140,7 @@ export default class Session extends Resource {
          .spread(function(session) {
             return session
          })
-         .catch(Exceptions.CheckpointError, function(error) {
+         .catch(CheckpointError, function(error) {
             // This situation is not really obvious,
             // but even if you got checkpoint error (aka captcha or phone)
             // verification, it is still an valid session unless `sessionid` missing
@@ -150,7 +150,7 @@ export default class Session extends Resource {
                   // We got sessionId and accountId, we are good to go
                   return session
                })
-               .catch(Exceptions.CookieNotValidError, function(e) {
+               .catch(CookieNotValidError, function(e) {
                   throw error
                })
          })
@@ -164,7 +164,7 @@ export default class Session extends Resource {
          .then(function() {
             return session
          })
-         .catch(Exceptions.CookieNotValidError, function() {
+         .catch(CookieNotValidError, function() {
             // We either not have valid cookes or authentication is not fain!
             return Session.login(session, username, password)
          })

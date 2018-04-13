@@ -3,7 +3,7 @@ import Resource from "./resource"
 import Request from "./request"
 import Helpers from "../../helpers"
 import camelKeys from "'camelcase-keys"
-import Exceptions from "./exceptions"
+import {IGAccountNotFoundError,RequestError} from "./exceptions"
 
 export default class Account extends Resource {
    parseParams(json) {
@@ -52,7 +52,7 @@ export default class Account extends Resource {
          var account = _.find(accounts, function(account) {
             return account.params.username === username
          })
-         if (!account) throw new Exceptions.IGAccountNotFoundError()
+         if (!account) throw new IGAccountNotFoundError()
          return account
       })
    }
@@ -140,7 +140,7 @@ export default class Account extends Resource {
          })
          .catch(function(e) {
             if (e && e.json && e.json.message && _.isArray(e.json.message.errors)) {
-               throw new Exceptions.RequestError({
+               throw new RequestError({
                   message: e.json.message.errors.join(". ")
                })
             }

@@ -4,7 +4,7 @@ import camelKeys from "camelcase-keys"
 import Request from "./request"
 import Helpers from "../../helpers"
 import Media from "./media"
-import Exceptions from "./exceptions"
+import {PlaceNotFound} from "./exceptions"
 
 export default class location extends Resource {
    constructor() {
@@ -27,7 +27,7 @@ export default class location extends Resource {
             })
             // will throw an error with 500 which turn to parse error
             .catch(Exceptions.ParseError, function() {
-               throw new Exceptions.PlaceNotFound()
+               throw new PlaceNotFound()
             })
       )
    }

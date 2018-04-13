@@ -4,7 +4,19 @@ import JSONbig from "json-bigint"
 import Agent from "socks5-https-client/lib/Agent"
 import signatures from "./signatures"
 import Device from "./device"
-import Exceptions from "./exceptions"
+import {
+   ActionSpamError,
+   ParseError,
+   ActionSpamError,
+   AuthenticationError,
+   SentryBlockError,
+   RequestsLimitError,
+   RequestError,
+   PrivateUserError,
+   TranscodeTimeoutError,
+   APIError,
+   NotFoundError
+} from "./exceptions"
 import routes from "./routes"
 import Helpers from "../../helpers"
 import CONSTANTS from "./constants"
@@ -240,28 +252,28 @@ export default class Request {
          response.body = JSONbig.parse(response.body)
          return response
       } catch (err) {
-         throw new Exceptions.ParseError(response, this)
+         throw new ParseError(response, this)
       }
    }
    errorMiddleware(response) {
       response = this.parseMiddleware(response)
       let json = response.body
-      if (json.spam) throw new Exceptions.ActionSpamError(json)
-      if (json.message == "challenge_required") throw new Exceptions.CheckpointError(json, this.session)
+      if (json.spam) throw new ActionSpamError(json)
+      if (json.message == "challenge_required") throw new CheckpointError(json, this.session)
       if (json.message == "login_required")
-         throw new Exceptions.AuthenticationError("Login required to process this request")
-      if (json.error_type == "sentry_block") throw new Exceptions.SentryBlockError(json)
+         throw new AuthenticationError("Login required to process this request")
+      if (json.error_type == "sentry_block") throw new SentryBlockError(json)
       if (
          response.statusCode === 429 ||
          (_.isString(json.message) && json.message.toLowerCase().indexOf("too many requests") !== -1)
       )
-         throw new Exceptions.RequestsLimitError()
+         throw new RequestsLimitError()
       if (
          _.isString(json.message) &&
          json.message.toLowerCase().indexOf("not authorized to view user") !== -1
       )
-         throw new Exceptions.PrivateUserError()
-      throw new Exceptions.RequestError(json)
+         throw new PrivateUserError()
+      throw new RequestError(json)
    }
    beforeParse(response, request, attemps) {
       return response
@@ -293,32 +305,32 @@ export default class Request {
             let json = response.body
             if (_.isObject(json) && json.status == "ok") return _.omit(response.body, "status")
             if (_.isString(json.message) && json.message.toLowerCase().indexOf("transcode timeout") !== -1)
-               throw new Exceptions.TranscodeTimeoutError()
-            throw new Exceptions.RequestError(json)
+               throw new TranscodeTimeoutError()
+            throw new RequestError(json)
          })
          .catch(function(error) {
             return that.beforeError(error, options, attemps)
          })
          .catch(function(err) {
-            if (err instanceof Exceptions.APIError) throw err
+            if (err instanceof APIError) throw err
             if (!err || !err.response) throw err
             let response = err.response
-            if (response.statusCode == 404) throw new Exceptions.NotFoundError(response)
+            if (response.statusCode == 404) throw new NotFoundError(response)
             if (response.statusCode >= 500) {
                if (attemps <= that.attemps) {
                   attemps += 1
                   return that.send(options, attemps)
                } else {
-                  throw new Exceptions.ParseError(response, that)
+                  throw new ParseError(response, that)
                }
             } else {
                that.errorMiddleware(response)
             }
          })
          .catch(function(error) {
-            if (error instanceof Exceptions.APIError) throw error
+            if (error instanceof APIError) throw error
             error = _.defaults(error, { message: "Fatal internal error!" })
-            throw new Exceptions.RequestError(error)
+            throw new RequestError(error)
          })
          .catch(function(error) {
             return that.afterError(error, options, attemps)

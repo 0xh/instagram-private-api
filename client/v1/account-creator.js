@@ -4,7 +4,7 @@ import Resource from "./resource"
 import Helpers from "../../helpers"
 import clean from "underscore.string/clean"
 
-import Exceptions from "./exceptions"
+import {InvalidUsername, InvalidEmail,InvalidPassword,InvalidParamsError,InvalidPhone,RequestsLimitError,AccountRegistrationError} from "./exceptions"
 import QE from "qe"
 import Relationship from "./relationship"
 import discover from "./discover"
@@ -26,7 +26,7 @@ export default class AccountCreator {
    setUsername(username) {
       username = username.toLowerCase()
       if (!username || !/^[a-z0-9\._]{1,50}$/.test(username)) {
-         throw new Exceptions.InvalidUsername(username)
+         throw new InvalidUsername(username)
       }
       this.username = username
       return this
@@ -36,7 +36,7 @@ export default class AccountCreator {
       return this
    }
    setPassword(password) {
-      if (!password || password.length < 6) throw new Exceptions.InvalidPassword()
+      if (!password || password.length < 6) throw new InvalidPassword()
       this.password = password
       return this
    }
@@ -61,10 +61,10 @@ export default class AccountCreator {
    validateUsername() {
       let username = this.username
       let self = this
-      if (!username) return Promise.reject(new Exceptions.InvalidUsername("Empty"))
+      if (!username) return Promise.reject(new InvalidUsername("Empty"))
       return this.checkUsername(username)
          .then(function(json) {})
-         .catch(Exceptions.InvalidUsername, function(e) {
+         .catch(InvalidUsername, function(e) {
             return self.usernameSuggestions(username).then(function(json) {
                e.json.suggestions = json.suggestions
                throw e
@@ -76,7 +76,7 @@ export default class AccountCreator {
       return QE.sync(session)
          .then(function() {
             var autocomplete = Relationship.autocompleteUserList(session).catch(
-               Exceptions.RequestsLimitError,
+               RequestsLimitError,
                function() {
                   // autocompleteUserList has ability to fail often
                   return false
@@ -116,7 +116,7 @@ export default class AccountPhoneCreator extends AccountCreator {
         AccountCreator.call(this, session, "phone")
     }
     setPhone(phone) {
-        if (!phone || !/^([0-9\(\)\/\+ \-]*)$/.test(phone)) throw new Exceptions.InvalidPhone(phone)
+        if (!phone || !/^([0-9\(\)\/\+ \-]*)$/.test(phone)) throw new InvalidPhone(phone)
         this.phone = phone
         return this
     }
@@ -144,7 +144,7 @@ export default class AccountPhoneCreator extends AccountCreator {
         })
         .then(function(code) {
             if (!_.isString(code) && !_.isNumber(code))
-               throw new Exceptions.AccountRegistrationError("Code is invalid")
+               throw new AccountRegistrationError("Code is invalid")
             code = clean(code.toString().trim()).replace(/\s+/, "")
             if (code.toString().length !== 6) throw new Error("Code must be 6 digits number")
             return [
@@ -161,7 +161,7 @@ export default class AccountPhoneCreator extends AccountCreator {
             ]
          })
          .spread(function(json, code) {
-            if (!json.verified) throw new Exceptions.AccountRegistrationError("Code is invalid", json)
+            if (!json.verified) throw new AccountRegistrationError("Code is invalid", json)
             return new Request(that.session)
                .setMethod("POST")
                .setResource("registrationCreateValidated")
@@ -181,7 +181,7 @@ export default class AccountPhoneCreator extends AccountCreator {
                .send()
          })
          .then(function(json) {
-            if (!json.account_created) throw new Exceptions.AccountRegistrationError(null, json)
+            if (!json.account_created) throw new AccountRegistrationError(null, json)
             return new Account(that.session, json.created_user)
          })
     }
@@ -192,7 +192,7 @@ export default class AccountEmailCreator extends AccountCreator {
         AccountCreator.call(this, session, "email")
     }
     setEmail(email) {
-        if (!email || !Helpers.validateEmail(email)) throw new Exceptions.InvalidEmail(email)
+        if (!email || !Helpers.validateEmail(email)) throw new InvalidEmail(email)
         this.email = email
         return this
     }
@@ -211,14 +211,14 @@ export default class AccountEmailCreator extends AccountCreator {
         let email = this.email
         let validateEmail = _.bind(this.checkEmail, this)
         if (!email || !Helpers.validateEmail(email))
-           return Promise.reject(new Exceptions.InvalidEmail(email))
+           return Promise.reject(new InvalidEmail(email))
         return this.validateUsername()
            .then(function() {
               return validateEmail()
            })
            .then(function(json) {
               if (!json.available || !json.valid)
-                 return Promise.reject(new Exceptions.InvalidEmail(email))
+                 return Promise.reject(new InvalidEmail(email))
               return true
            })
     }
@@ -242,7 +242,7 @@ export default class AccountEmailCreator extends AccountCreator {
            .signPayload()
            .send()
            .then(function(json) {
-              if (!json.account_created) throw new Exceptions.AccountRegistrationError(null, json)
+              if (!json.account_created) throw new AccountRegistrationError(null, json)
               return new Account(that.session, json.created_user)
            })
     }

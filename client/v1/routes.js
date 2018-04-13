@@ -1,6 +1,5 @@
 import CONSTANTS from './constants';
-var _ = require('lodash');
-
+import _ from "lodash"
 var URLs = {};
 _.each(CONSTANTS.ROUTES, function (val, key) {
     URLs[key] = _.template(val);

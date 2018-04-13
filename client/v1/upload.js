@@ -3,8 +3,6 @@ import Resource from './resource';
 import * as Helpers from '../../helpers';
 import Promise from 'bluebird';
 import camelKeys from 'camelcase-keys';
-
-import Exceptions from './exceptions';
 import Request from './request';
 
 export default class Upload extends Resource {

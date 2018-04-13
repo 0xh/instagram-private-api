@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import Promise from 'bluebird';
-import Exceptions from './exceptions';
 import hmac from 'crypto-js/hmac-sha256';
 import * as CONSTANTS from './constants';
 import pruned from './json-pruned';

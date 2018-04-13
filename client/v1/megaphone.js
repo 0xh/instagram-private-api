@@ -1,6 +1,5 @@
 import _ from "lodash"
 import Resource from "./resource"
-import Exceptions from "./exceptions"
 
 export default class Megaphone extends Resource {
    constructor() {

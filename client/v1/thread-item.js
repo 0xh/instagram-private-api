@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import Resource from "./resource";
 import camelKeys from 'camelcase-keys';
-
 import Account from './account';
 import Media from './media';
 import Location from './location';
