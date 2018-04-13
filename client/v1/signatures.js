@@ -6,6 +6,8 @@ var CONSTANTS = require('./constants');
 var pruned = require('./json-pruned');
 
 
+
+/*
 exports.sign = function(payload) {
     var key = CONSTANTS.PRIVATE_KEY;
     var json = _.isString(payload) ? payload : pruned(payload);
@@ -20,3 +22,4 @@ exports.sign = function(payload) {
     })
   
 }
+*/

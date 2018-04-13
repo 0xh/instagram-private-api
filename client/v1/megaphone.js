@@ -1,32 +1,27 @@
-var util = require("util");
-var _ = require("lodash");
-var Resource = require("./resource");
+import _ from "lodash"
+import Resource from "./resource"
+import Exceptions from "./exceptions"
 
-function Megaphone() {
-    Resource.apply(this, arguments);
-}
-
-util.inherits(Megaphone, Resource);
-var Request = require("./request");
-
-module.exports = Megaphone;
-var Exceptions = require('./exceptions');
-
-
-Megaphone.log = function (session, data) {
-    return new Request(session)
-        .setMethod('POST')
-        .setResource('megaphoneLog')
-        .generateUUID()
-        .setData(_.extend(data, {
-            uuid: session.device.md5
-        }));
-};
-
-Megaphone.logSeenMainFeed = function (session) {
+export default class Megaphone extends Resource {
+   constructor() {
+      super()
+   }
+   static log(session, data) {
+      return new Request(session)
+         .setMethod("POST")
+         .setResource("megaphoneLog")
+         .generateUUID()
+         .setData(
+            _.extend(data, {
+               uuid: session.device.md5
+            })
+         )
+   }
+   static logSeenMainFeed(session) {
     return Megaphone.log(session, {
-        action: 'seen',
-        display_medium: 'main_feed',
-        type: 'feed_aysf'
-    })
-};
+        action: "seen",
+        display_medium: "main_feed",
+        type: "feed_aysf"
+     })
+   }
+}

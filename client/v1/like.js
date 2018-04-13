@@ -1,51 +1,42 @@
-var Resource = require('./resource');
-var util = require("util");
-var _ = require("lodash");
+import Resource from "./resource"
+import _ from "lodash"
+import Request from "./request"
 
-
-function Like(session, params) {
-    Resource.apply(this, arguments);
-}
-
-module.exports = Like;
-util.inherits(Like, Resource);
-
-var Request = require('./request');
-
-
-Like.prototype.parseParams = function (json) {
-    return json || {};
-};
-
-
-Like.create = function(session, mediaId) {
-    return new Request(session)
-        .setMethod('POST')
-        .setResource('like', {id: mediaId})
-        .generateUUID()
-        .setData({
+export default class Like extends Resource {
+   constructor() {
+      super()
+   }
+   parseParams(json) {
+      return json || {}
+   }
+   static create(session, mediaId) {
+      return new Request(session)
+         .setMethod("POST")
+         .setResource("like", { id: mediaId })
+         .generateUUID()
+         .setData({
             media_id: mediaId,
             src: "profile"
-        })
-        .signPayload()
-        .send()
-        .then(function(data) {
-            return new Like(session, {});
-        })
-}
-
-Like.destroy = function(session, mediaId) {
-    return new Request(session)
-        .setMethod('POST')
-        .setResource('unlike', {id: mediaId})
-        .generateUUID()
-        .setData({
+         })
+         .signPayload()
+         .send()
+         .then(function(data) {
+            return new Like(session, {})
+         })
+   }
+   static destroy(session, mediaId) {
+      return new Request(session)
+         .setMethod("POST")
+         .setResource("unlike", { id: mediaId })
+         .generateUUID()
+         .setData({
             media_id: mediaId,
             src: "profile"
-        })
-        .signPayload()
-        .send()
-        .then(function(data) {
-            return new Like(session, {});
-        })
+         })
+         .signPayload()
+         .send()
+         .then(data => {
+            return new Like(session, {})
+         })
+   }
 }

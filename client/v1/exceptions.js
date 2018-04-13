@@ -2,11 +2,12 @@ import _ from "lodash"
 import routes from "./routes"
 
 // Basic error
-function APIError(message) {
-   this.name = "APIError"
-   this.message = message || "Instagram API error was made."
-}
 export class APIError extends Error {
+   constructor() {
+      super()
+      this.name = "APIError"
+      this.message = message || "Instagram API error was made."
+   }
    serialize() {
       return {
          error: this.constructor.name,
@@ -170,8 +171,7 @@ export class CookieNotValidError extends APIError {
    constructor() {
       super()
       this.name = "CookieNotValidError"
-      this.message =
-         "Cookie `" + cookieName + "` you are searching found was either not found or not valid!"
+      this.message = "Cookie `" + cookieName + "` you are searching found was either not found or not valid!"
    }
 }
 export class IGAccountNotFoundError extends APIError {

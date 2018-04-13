@@ -6,7 +6,7 @@ import Account from "./account"
 
 
 
-export default async function(session, inSingup) {
+export default function(session, inSingup) {
     return new Request(session)
         .setMethod('POST')
         .setResource('discoverAyml')

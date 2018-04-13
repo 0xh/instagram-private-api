@@ -1,35 +1,28 @@
-var util = require("util");
-var _ = require("lodash");
-var Resource = require("./resource");
-const CONSTANTS = require("./constants");
+import Resource from "./resource"
+import _ from "lodash"
+import CONSTANTS from "constants"
+import Exceptions from "./exceptions"
+import Request from "./request"
 
-
-function QE() {
-    Resource.apply(this, arguments);
+export default class QE extends Resource {
+   constructor() {
+      super()
+   }
+   static sync(session) {
+      let random = parseInt(Math.random() * 100) + 1
+      let experiments = _.sampleSize(CONSTANTS.EXPERIMENTS, random)
+      return session.getAccountId().then(function(id) {
+         return new Request(session)
+            .setMethod("POST")
+            .setResource("qeSync")
+            .generateUUID()
+            .setData({
+               id: id,
+               _uid: id,
+               experiments: experiments.join(",")
+            })
+            .signPayload()
+            .send()
+      })
+   }
 }
-
-util.inherits(QE, Resource);
-
-module.exports = QE;
-var Exceptions = require('./exceptions');
-var Request = require("./request");
-
-// Lets fake this experiment bullshit
-QE.sync = function (session) {
-    var random = parseInt(Math.random() * 100) + 1;   
-    var experiments = _.sampleSize(CONSTANTS.EXPERIMENTS, random);
-    return session.getAccountId()
-        .then(function(id) {
-            return new Request(session)
-                .setMethod('POST')
-                .setResource('qeSync')
-                .generateUUID()
-                .setData({
-                    id: id,
-                    _uid: id,
-                    experiments: experiments.join(',')
-                }) 
-                .signPayload()
-                .send();
-        });
-};

@@ -1,18 +1,15 @@
-var util = require("util");
-var _ = require("lodash");
-var Resource = require("./resource");
+import _ from "lodash"
+import Resource from "./resource"
 
-function Placeholder(session, params) {
-    Resource.apply(this, arguments);
+export default class Placeholder extends Resource {
+   constructor() {
+      super()
+   }
+   parseParams(json) {
+      var hash = {}
+      hash.is_linked = json.is_linked
+      hash.title = json.title
+      hash.message = json.message
+      return hash
+   }
 }
-
-util.inherits(Placeholder, Resource);
-module.exports = Placeholder;
-
-Placeholder.prototype.parseParams = function (json) {
-    var hash = {};
-    hash.is_linked = json.is_linked;
-    hash.title = json.title;
-    hash.message = json.message;
-    return hash;
-};
