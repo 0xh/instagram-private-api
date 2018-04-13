@@ -1,24 +1,25 @@
-var _ = require('lodash');
+import _ from "lodash"
+import FeedBase from "./feed-base"
+import Request from "../request"
+import Media from "../media"
+import Helpers from "../../../helpers"
 
-function StoryTray(session) {
-    this.session = session;
+export default class StoryTray {
+   constructor(session) {
+      super(session)
+      this.session = session
+   }
+   get() {
+      let that = this
+      return new Request(that.session)
+         .setMethod("GET")
+         .setResource("storyTray")
+         .send()
+         .then(function(data) {
+            var media = _.map(data.items, function(medium) {
+               return new Media(that.session, medium)
+            })
+            return media
+         })
+   }
 }
-
-module.exports = StoryTray;
-var Request = require('../request');
-var Helpers = require('../../../helpers');
-var Media = require('../media');
-
-StoryTray.prototype.get = function () {
-    var that = this;
-    return new Request(that.session)
-        .setMethod('GET')
-        .setResource('storyTray')
-        .send()
-        .then(function(data) {
-            var media = _.map(data.items, function(medium){
-                return new Media(that.session, medium);
-            });
-            return media;    
-        });
-};

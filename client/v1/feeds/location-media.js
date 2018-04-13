@@ -1,42 +1,40 @@
-var _ = require('lodash');
-var util = require('util');
-var FeedBase = require('./feed-base');
+import _ from "lodash"
+import FeedBase from "./feed-base"
+import Request from "../request"
+import Media from "../media"
+import Helpers from "../../../helpers"
+import {OnlyRankedItemsError,PlaceNotFound,ParseError} from "../exceptions"
 
-function LocationMediaFeed(session, locationId, limit) {
-    this.limit = parseInt(limit) || null;
-    this.locationId = locationId;
-    FeedBase.apply(this, arguments);
+export default class LocationMediaFeed extends FeedBase {
+   constructor(session, locationId, limit) {
+      super(session, locationId, limit)
+      this.limit = parseInt(limit) || null
+      this.locationId = locationId
+   }
+   get() {
+      var that = this
+      return (
+         new Request(that.session)
+            .setMethod("GET")
+            .setResource("locationFeed", {
+               id: that.locationId,
+               maxId: that.getCursor(),
+               rankToken: Helpers.generateUUID()
+            })
+            .send()
+            .then(function(data) {
+               that.moreAvailable = data.more_available && !!data.next_max_id
+               if (!that.moreAvailable && !_.isEmpty(data.ranked_items) && !that.getCursor())
+                  throw new OnlyRankedItemsError()
+               if (that.moreAvailable) that.setCursor(data.next_max_id)
+               return _.map(data.items, function(medium) {
+                  return new Media(that.session, medium)
+               })
+            })
+            // will throw an error with 500 which turn to parse error
+            .catch(ParseError, function() {
+               throw new PlaceNotFound()
+            })
+      )
+   }
 }
-util.inherits(LocationMediaFeed, FeedBase);
-
-module.exports = LocationMediaFeed;
-var Media = require('../media');
-var Request = require('../request');
-var Helpers = require('../../../helpers');
-var Exceptions = require('../exceptions');
-
-LocationMediaFeed.prototype.get = function () {
-    var that = this;
-    return new Request(that.session)
-        .setMethod('GET')
-        .setResource('locationFeed', {
-            id: that.locationId,
-            maxId: that.getCursor(),
-            rankToken: Helpers.generateUUID()
-        })
-        .send()
-        .then(function(data) {
-            that.moreAvailable = data.more_available && !!data.next_max_id;
-            if (!that.moreAvailable && !_.isEmpty(data.ranked_items) && !that.getCursor())
-                throw new Exceptions.OnlyRankedItemsError;
-            if (that.moreAvailable)
-                that.setCursor(data.next_max_id);
-            return _.map(data.items, function (medium) {
-                return new Media(that.session, medium);
-            });
-        })
-        // will throw an error with 500 which turn to parse error
-        .catch(Exceptions.ParseError, function(){
-            throw new Exceptions.PlaceNotFound();
-        })
-};
