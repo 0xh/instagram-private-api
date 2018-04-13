@@ -1,22 +1,19 @@
-var _ = require('lodash');
-var Promise = require('bluebird');
-var Exceptions = require('./exceptions');
-var hmac = require('crypto-js/hmac-sha256');
-var CONSTANTS = require('./constants');
-var pruned = require('./json-pruned');
+import _ from 'lodash';
+import Promise from 'bluebird';
+import Exceptions from './exceptions';
+import hmac from 'crypto-js/hmac-sha256';
+import * as CONSTANTS from './constants';
+import pruned from './json-pruned';
 
+export function sign(payload) {
+    const key = CONSTANTS.PRIVATE_KEY;
+    const json = _.isString(payload) ? payload : pruned(payload);
+    const signed = hmac(json, key.SIG_KEY);
 
-exports.sign = function(payload) {
-    var key = CONSTANTS.PRIVATE_KEY;
-    var json = _.isString(payload) ? payload : pruned(payload);
-    var signed = hmac(json, key.SIG_KEY);
-    return new Promise(function(resolve, reject) {
-        return resolve({
-            signature: signed.toString(),
-            appVersion: key.APP_VERSION,
-            sigKeyVersion: key.SIG_VERSION,
-            payload: json
-        })
+    return Promise.resolve({
+        signature: signed.toString(),
+        appVersion: key.APP_VERSION,
+        sigKeyVersion: key.SIG_VERSION,
+        payload: json,
     })
-  
 }
