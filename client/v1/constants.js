@@ -1,7 +1,7 @@
 import _ from "lodash"
-const EXPERIMENTS = require('./experiments.json')
+import * as EXPERIMENTS from './experiments.json'
 
-const ROUTES = {
+export const ROUTES = {
     follow: 'friendships/create/<%= id %>/',
     unfollow: 'friendships/destroy/<%= id %>/',
     expose: 'qe/expose/',
@@ -82,37 +82,26 @@ const ROUTES = {
     storyTray: 'feed/reels_tray/'
 };
 
-
-const WEB_ROUTES = {
+export const WEB_ROUTES = {
     challengeReset: 'challenge/reset/',
     challenge: 'challenge/',
     userInfo: '<%= id %>/'
 }
 
-const PRIVATE_KEY = {
+export const PRIVATE_KEY = {
     SIG_KEY: '0443b39a54b05f064a4917a3d1da4d6524a3fb0878eacabf1424515051674daa',
     SIG_VERSION: '4',
     APP_VERSION: '10.33.0'
 }
 
+export const TLD = 'instagram.com';
+export const HOSTNAME = 'i.instagram.com';
+export const WEB_HOSTNAME = 'www.instagram.com';
+export const HOST = 'https://' + HOSTNAME + '/';
+export const WEBHOST = 'https://' + WEB_HOSTNAME + '/';
+export const API_ENDPOINT = HOST + 'api/v1/';
+export const instagramAgentTemplate = _.template('Instagram <%= version %> Android (<%= agent %>)')
 
-const TLD = 'instagram.com';
-const HOSTNAME = 'i.instagram.com';
-const WEB_HOSTNAME = 'www.instagram.com';
-const HOST = 'https://' + HOSTNAME + '/';
-const WEBHOST = 'https://' + WEB_HOSTNAME + '/';
-
-
-module.exports = {
-    ROUTES: ROUTES,
-    WEB_ROUTES: WEB_ROUTES,
-    HOSTNAME: HOSTNAME,
-    WEB_HOSTNAME: WEB_HOSTNAME,
-    HOST: HOST,
-    WEBHOST: WEBHOST,
-    TLD: TLD,
-    API_ENDPOINT: HOST + 'api/v1/',
-    EXPERIMENTS: EXPERIMENTS,
-    PRIVATE_KEY: PRIVATE_KEY,
-    instagramAgentTemplate: _.template('Instagram <%= version %> Android (<%= agent %>)')
+export {
+    EXPERIMENTS,
 }
